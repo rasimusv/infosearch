@@ -22,7 +22,7 @@ stopwords_all = stopwords_en + stopwords_ru
 tokens = []
 
 for file in files:
-    html = open(file)
+    html = open(file, encoding='iso8859_1')
     text = BeautifulSoup(html, 'html.parser').get_text().lower()
     tokens += nltk.word_tokenize(text)
 
