@@ -9,7 +9,7 @@ from pymystem3 import Mystem
 
 directory = 'task1_pages/'
 
-files = [directory + f for f in listdir(directory) if isfile(join(directory, f))]
+files = [directory + f for f in listdir(directory) if isfile(join(directory, f)) and f != 'pages_archive.zip']
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -22,7 +22,7 @@ stopwords_all = stopwords_en + stopwords_ru
 tokens = []
 
 for file in files:
-    html = open(file, encoding='iso8859_1')
+    html = open(file)
     text = BeautifulSoup(html, 'html.parser').get_text().lower()
     tokens += nltk.word_tokenize(text)
 
@@ -57,6 +57,6 @@ for lemma in lemmas:
     tokens = ''
     for token in lemmas[lemma]:
         tokens += ' ' + token
-    lemmas_file.write(lemma + tokens +'\n')
+    lemmas_file.write(lemma + tokens + '\n')
 
 lemmas_file.close()
