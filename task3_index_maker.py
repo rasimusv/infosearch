@@ -3,16 +3,16 @@ from os import listdir
 from os.path import isfile, join
 
 # считать токены
-tokens_file = open('task2_output/tokens.txt', encoding='iso8859_1')
-index_file = open('task3_output/index.txt', 'w', encoding='iso8859_1')
+tokens_file = open('task2_output/tokens.txt')
+index_file = open('task3_output/index.txt', 'w')
 
 directory = 'task1_pages/'
-files = [directory + f for f in listdir(directory) if isfile(join(directory, f))]
+files = [directory + f for f in listdir(directory) if isfile(join(directory, f)) and f != 'pages_archive.zip']
 texts = []
 index = []
 
 for file in files:
-    html = open(file, encoding='iso8859_1')
+    html = open(file)
     text = BeautifulSoup(html, 'html.parser').get_text()
     texts.append(text)
 

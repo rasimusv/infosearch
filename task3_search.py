@@ -1,9 +1,8 @@
 import nltk
-from nltk import WordNetLemmatizer
 
-def find_request(str, d: dict):
 
-    words = str.split()
+def find_request(search_str, d: dict):
+    words = search_str.split()
     words_len = len(words)
 
     all_texts_set = set()
@@ -43,7 +42,6 @@ def find_request(str, d: dict):
             word = nltk.word_tokenize(word)[0]
             texts_for_word = d.get(word)
 
-
         if prev_word == 'AND':
             last_res = res_before_or.pop()
             res_before_or.append(last_res.intersection(texts_for_word))
@@ -60,19 +58,18 @@ def find_request(str, d: dict):
 
     return res
 
+
 # Можно задать самостоятельно
-str = 'NOT кампании AND сю OR зелотов'
+search_string = 'NOT кампании AND сю OR зелотов'
 d = {}
-index_file = open('task3_output/index.txt', encoding='iso8859_1')
+index_file = open('task3_output/index.txt')
 for index in index_file.read().splitlines():
     word = index.split()
     d[word[0]] = set([int(i) for i in word[1:]])
 print(d)
 
-d = {'кампании': set([8, 54]),
-    'зелотов': set([64]),
-    'сю': set([1, 2, 3, 4, 5, 6, 7, 8])}
+d = {'кампании': {8, 54},
+     'зелотов': {64},
+     'сю': {1, 2, 3, 4, 5, 6, 7, 8}}
 
-print(find_request(str, d))
-
-
+print(find_request(search_string, d))
