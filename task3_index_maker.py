@@ -7,13 +7,18 @@ tokens_file = open('task2_output/tokens.txt')
 index_file = open('task3_output/index.txt', 'w')
 
 directory = 'task1_pages/'
-files = [directory + f for f in listdir(directory) if isfile(join(directory, f)) and f != 'pages_archive.zip']
+
+filenames = listdir(directory)
+filenames.remove('pages_archive.zip')
+filenames.sort(key=lambda x: int(x.replace('.html', '')))
+
+files = [open(directory + f) for f in filenames if isfile(join(directory, f))]
+
 texts = []
 index = []
 
 for file in files:
-    html = open(file)
-    text = BeautifulSoup(html, 'html.parser').get_text()
+    text = BeautifulSoup(file, 'html.parser').get_text().lower()
     texts.append(text)
 
 

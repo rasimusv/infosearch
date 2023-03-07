@@ -9,7 +9,11 @@ from pymystem3 import Mystem
 
 directory = 'task1_pages/'
 
-files = [directory + f for f in listdir(directory) if isfile(join(directory, f)) and f != 'pages_archive.zip']
+filenames = listdir(directory)
+filenames.remove('pages_archive.zip')
+filenames.sort(key=lambda x: int(x.replace('.html', '')))
+
+files = [open(directory + f) for f in filenames if isfile(join(directory, f))]
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -22,8 +26,7 @@ stopwords_all = stopwords_en + stopwords_ru
 tokens = []
 
 for file in files:
-    html = open(file)
-    text = BeautifulSoup(html, 'html.parser').get_text().lower()
+    text = BeautifulSoup(file, 'html.parser').get_text().lower()
     tokens += nltk.word_tokenize(text)
 
 almost_clean_tokens = set([w for w in tokens if not re.search(r"[^a-zA-Zа-яА-ЯёЁ]", w)])
