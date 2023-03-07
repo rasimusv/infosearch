@@ -24,8 +24,7 @@ for token in tokens_file.read().splitlines():
         i = i + 1
         if token in text:
             numbers_of_texts += (str(i) + " ")
-    if numbers_of_texts != " ":
-        index_file.write(token + numbers_of_texts + '\n')
+    index_file.write(token + numbers_of_texts + '\n')
 
 index_file.close()
 
