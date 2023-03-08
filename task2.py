@@ -13,7 +13,7 @@ filenames = listdir(directory)
 filenames.remove('pages_archive.zip')
 filenames.sort(key=lambda x: int(x.replace('.html', '')))
 
-files = [open(directory + f) for f in filenames if isfile(join(directory, f))]
+texts = [BeautifulSoup(open(directory + f).read(), 'html.parser').get_text().lower() for f in filenames if isfile(join(directory, f))]
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -23,20 +23,13 @@ stopwords_ru = stopwords.words("russian")
 stopwords_en = stopwords.words("english")
 stopwords_all = stopwords_en + stopwords_ru
 
-tokens = []
-
-for file in files:
-    text = BeautifulSoup(file, 'html.parser').get_text().lower()
-    tokens += nltk.word_tokenize(text)
+tokens = [nltk.word_tokenize(text) for text in texts]
 
 almost_clean_tokens = set([w for w in tokens if not re.search(r"[^a-zA-Zа-яА-ЯёЁ]", w)])
 clean_tokens = [w for w in almost_clean_tokens if w not in stopwords_all]
 
 tokens_file = open('task2_output/tokens.txt', 'w')
-
-for token in clean_tokens:
-    tokens_file.write(token + '\n')
-
+tokens_file.writelines(clean_tokens)
 tokens_file.close()
 
 lemmatizer_en = WordNetLemmatizer()

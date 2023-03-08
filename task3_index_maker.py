@@ -12,14 +12,9 @@ filenames = listdir(directory)
 filenames.remove('pages_archive.zip')
 filenames.sort(key=lambda x: int(x.replace('.html', '')))
 
-files = [open(directory + f) for f in filenames if isfile(join(directory, f))]
+texts = [BeautifulSoup(open(directory + f).read(), 'html.parser').get_text().lower() for f in filenames if isfile(join(directory, f))]
 
-texts = []
 index = []
-
-for file in files:
-    text = BeautifulSoup(file, 'html.parser').get_text().lower()
-    texts.append(text)
 
 
 for token in tokens_file.read().splitlines():
