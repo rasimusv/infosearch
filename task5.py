@@ -1,20 +1,11 @@
-import numpy as np
-from bs4 import BeautifulSoup
 import nltk
+import numpy as np
 from nltk import WordNetLemmatizer
 from nltk.corpus import stopwords
 import re
 import pandas as pd
-from os import listdir
-from os.path import isfile, join
 from pymystem3 import Mystem
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-print("Здравствуйте, я поисковик, введите ваш запрос!")
-input_str = input()
-
-#texts = ["Плотность населения была высокой в Южной Европе"]
-texts = [input_str]
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -30,7 +21,6 @@ lemmas = [word.split(' ')[0] for word in open('task2_output/lemmas.txt').read().
 lemmatizer_en = WordNetLemmatizer()
 lemmatizer_ru = Mystem()
 
-output_directory = "task4_output/"
 
 def coef_otaiai(df1, df2):
     merged_df = pd.merge(df1, df2, on='word')
@@ -43,8 +33,6 @@ def coef_otaiai(df1, df2):
     numerator = np.sum(x_dev * y_dev)
     denominator = np.sqrt(np.sum(x_dev ** 2) * np.sum(y_dev ** 2))
     return numerator / denominator
-
-
 
 
 def get_tokens(text: str):
@@ -66,40 +54,56 @@ def get_lemmas(text: str):
     return text_lemmas
 
 
-tokens_vectorizer = TfidfVectorizer(analyzer=get_tokens, vocabulary=tokens)
+def process(input_str):
+    texts = [input_str]
+    tokens_vectorizer = TfidfVectorizer(analyzer=get_tokens, vocabulary=tokens)
 
-tokens_matrix = tokens_vectorizer.fit_transform(texts)
+    tokens_matrix = tokens_vectorizer.fit_transform(texts)
 
-tokens_idf = pd.DataFrame(tokens_vectorizer.idf_, index=tokens, columns=["idf"])
+    tokens_idf = pd.DataFrame(tokens_vectorizer.idf_, index=tokens, columns=["idf"])
 
-tokens_tfidf = pd.DataFrame(tokens_matrix.T.todense(), index=tokens, columns=["tf-idf"])
+    tokens_tfidf = pd.DataFrame(tokens_matrix.T.todense(), index=tokens, columns=["tf-idf"])
 
-tokens_result_df = pd.concat([tokens_idf, tokens_tfidf], axis=1)
-tokens_result_df = tokens_result_df.rename(columns={tokens_result_df.columns[0]: 'word'})
+    tokens_result_df = pd.concat([tokens_idf, tokens_tfidf], axis=1)
+    tokens_result_df = tokens_result_df.rename(columns={tokens_result_df.columns[0]: 'word'})
 
-tokens_file = open(f"tokens.txt", "w")
-tokens_file.write(tokens_result_df.to_csv(sep=" ", header=False))
-tokens_file.close()
+    tokens_file = open(f"tokens.txt", "w")
+    tokens_file.write(tokens_result_df.to_csv(sep=" ", header=False))
+    tokens_file.close()
 
-tokens_for_query_read = pd.read_csv(
-    'tokens.txt',
-    delimiter=' ',
-    names=['word', 'idf', 'td-idf']
-)
-
-dict_ans = {}
-directory = 'task4_output/'
-
-for i in range(100):
-     tokens_for_text_read= pd.read_csv(
-        f'{output_directory}tokens{i+1}.txt',
+    tokens_for_query_read = pd.read_csv(
+        'tokens.txt',
         delimiter=' ',
         names=['word', 'idf', 'td-idf']
-     )
-     dict_ans[i + 1] = coef_otaiai(tokens_for_text_read, tokens_for_query_read)
+    )
 
-sorted_dict_ans = dict(sorted(dict_ans.items(), key=lambda x: x[1]))
-sorted_keys = sorted(sorted_dict_ans, key=sorted_dict_ans.get, reverse=True)
+    dict_ans = {}
 
-for key in sorted_keys:
-    print("text " + str(key))
+    output_directory = "task4_output/"
+
+    for i in range(100):
+        tokens_for_text_read = pd.read_csv(
+            f'{output_directory}tokens{i + 1}.txt',
+            delimiter=' ',
+            names=['word', 'idf', 'td-idf']
+        )
+        dict_ans[i + 1] = coef_otaiai(tokens_for_text_read, tokens_for_query_read)
+
+    sorted_dict_ans = dict(sorted(dict_ans.items(), key=lambda x: x[1]))
+    sorted_keys = sorted(sorted_dict_ans, key=sorted_dict_ans.get, reverse=True)
+
+    return sorted_keys
+
+
+def manual_mode():
+    print("Салам брат, я поисковик, дон, введите ваш запрос!")
+    input_str = input()
+
+    # texts = ["Плотность населения была высокой в Южной Европе"]
+    query = [input_str]
+
+    for key in process(query):
+        print("text " + str(key))
+
+
+# manual_mode()
